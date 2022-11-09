@@ -55,15 +55,12 @@ pub extern "C" fn decrypt(modulo: &Block,
 
 fn _gen_two_primes<R: Rng + ?Sized>(rng: &mut R) -> (Bigi<ORDER>, Bigi<ORDER>) {
     let p1: Bigi<ORDER> = prime::gen_prime(rng,BITS / 2);
-    let p2: Bigi<ORDER> = 'block: {
-        loop {
-            let p2: Bigi<ORDER> = prime::gen_prime(rng, BITS / 2);
-            if p1 != p2 {
-                break 'block p2;
-            }
+    loop {
+        let p2: Bigi<ORDER> = prime::gen_prime(rng, BITS / 2);
+        if p1 != p2 {
+            return (p1, p2);
         }
-    };
-    (p1, p2)
+    }
 }
 
 
@@ -102,7 +99,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_genkeys() {
+    fn test() {
         let mut modulo: [u8; BYTES] = [0; BYTES];
         let mut privatekey: [u8; BYTES] = [0; BYTES];
         let mut publickey: [u8; BYTES] = [0; BYTES];
